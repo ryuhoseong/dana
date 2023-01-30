@@ -18,13 +18,15 @@ public class Cote {
     void 약관에_따른_개인정보_파기() {
         //[1, 3]
         String today = "2022.05.19";
-        String[] terms = {"A 6", "B 12", "C 3", "D 5", "Z 5"};
-        String[] privacies = {"2021.05.02 A", "2021.07.01 B", "2022.02.19 C", "2022.02.20 C"};
+        String[] terms = {"A 30", "B 12", "C 3", "D 5", "Z 5"};
+        String[] privacies = {"2021.06.02 A", "2021.01.01 B", "2022.09.19 C", "2022.09.20 C"};
 //        String[] privacies = {"2019.12.01 D", "2019.11.15 Z", "2019.08.02 D", "2019.07.01 D", "2018.12.28 Z"};
         int[] rs = solution(today, terms, privacies);
 
         logger.info("rs " + Arrays.toString(rs));
     }
+
+    int len;
 
     public int[] solution(String today, String[] terms, String[] privacies) {
 
@@ -42,7 +44,7 @@ public class Cote {
         for (String privacy : privacies) {
             String[] privacyArr = privacy.split(" ");
 
-            if (todayInt > afterDate(privacyArr[0], termsMap.get(privacyArr[1]))){
+            if (todayInt > expireDate(privacyArr[0], termsMap.get(privacyArr[1]))){
                 answer[j] = i;
                 j++;
             };
@@ -52,29 +54,36 @@ public class Cote {
         return Arrays.stream(answer).filter(a -> a > 0).toArray();
     }
 
-    public int afterDate(String refDay, String term) {
+    public int expireDate(String refDay, String term) {
 
         String[] refDays = refDay.split("\\.");
 
-        int afterYear = Integer.parseInt(refDays[0]);
-        int afterMonth = Integer.parseInt(refDays[1]) + Integer.parseInt(term);
-        int afterDay = Integer.parseInt(refDays[2]) - 1;
+        int expireYear = Integer.parseInt(refDays[0]);
+        int expireMonth = Integer.parseInt(refDays[1]) + Integer.parseInt(term);
+        int expireDay = Integer.parseInt(refDays[2]) - 1;
 
-        if  (afterMonth > 12) {
-            int addYear = afterMonth / 12;
-            afterMonth %= 12;
-            afterYear += addYear;
+        int addYear = expireMonth / 12;
+
+        expireMonth = expireMonth % 12 == 0 ? 12 : expireMonth % 12;
+        expireYear += (expireMonth == 12 || expireMonth == 1 && expireDay == 0) ? addYear - 1 : addYear;
+
+        if (expireDay == 0) {
+            expireMonth = expireMonth == 1 ? 12 : expireMonth - 1;
+            expireDay = 28;
         }
 
-        afterDay = afterDay == 0 ? 28 : afterDay;
+        String mm = expireMonth < 10  ? "0" + expireMonth : String.valueOf(expireMonth);
+        String dd = expireDay < 10 ? "0" + expireDay : String.valueOf(expireDay);
 
-        String mm = (String.valueOf(afterMonth).length() == 1) ? "0" + afterMonth : String.valueOf(afterMonth);
-        String dd = (String.valueOf(afterDay).length() == 1) ? "0" + afterDay : String.valueOf(afterDay);
+        logger.info("after date: " + expireYear + mm + dd);
 
-        logger.info("after date: " + afterYear + mm + dd);
+        return Integer.parseInt(expireYear + mm + dd);
 
-        return Integer.parseInt(afterYear + mm + dd);
+    }
 
+    @Test
+    void sample(){
+        logger.info("rs: " + (12 > 12));
     }
 
 }
