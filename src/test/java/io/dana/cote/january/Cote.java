@@ -72,18 +72,13 @@ public class Cote {
             expireDay = 28;
         }
 
-        String mm = expireMonth < 10  ? "0" + expireMonth : String.valueOf(expireMonth);
-        String dd = expireDay < 10 ? "0" + expireDay : String.valueOf(expireDay);
+        String mm = String.format("%02d", expireMonth);
+        String dd = String.format("%02d", expireDay);
 
         logger.info("after date: " + expireYear + mm + dd);
 
         return Integer.parseInt(expireYear + mm + dd);
 
-    }
-
-    @Test
-    void sample(){
-        logger.info("rs: " + (12 > 12));
     }
 
 }
